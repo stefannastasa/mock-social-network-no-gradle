@@ -20,6 +20,7 @@ public class EID {
     public EID(String doBy){
         raw = enc.Encode(doBy);
     }
+    public EID(byte[] doBy){this.raw = doBy;}
 
     /**
      * For two EID classes to be equal, they need to have the exact same raw value

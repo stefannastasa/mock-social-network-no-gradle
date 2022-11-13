@@ -11,11 +11,6 @@ import java.util.stream.Stream;
 public interface Repository<key_type,obj_type> {
 
     /**
-     * Function for interfacing with the Persistence layer. Might need improvements.
-     * */
-    void sync();
-
-    /**
      * Adds an element to the repo
      * @param O new object to be added
      * @throws ElementExistsException if the given key already has an object assigned

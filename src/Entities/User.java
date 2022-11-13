@@ -2,6 +2,7 @@ package Entities;
 import Utils.SimpleEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -40,6 +41,13 @@ public class User {
         this.setName(name);
         this.setUsername(username);
         this.setPasswordHash(pd.Encode(password));
+        this.resetEID();
+    }
+    public User(String email, String username, String name, byte[]password){
+        this.setEmail(email);
+        this.setName(name);
+        this.setUsername(username);
+        this.setPasswordHash(password);
         this.resetEID();
     }
     /**
@@ -140,5 +148,8 @@ public class User {
         if(!Arrays.equals(null, O.getPasswordHash()))
             this.setPasswordHash(O.getPasswordHash());
 
+    }
+    public String getCSVFormat(){
+        return this.email + "," + this.name + "," + this.username + "," + Base64.getEncoder().encodeToString(this.passwordHash)+"\n";
     }
 }

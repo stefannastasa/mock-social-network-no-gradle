@@ -6,17 +6,16 @@ import Entities.User;
 import Exceptions.SocialNetworkException;
 import Repository.UserRepository;
 import Repository.FriendshipRepository;
-import Strategies.InputValidator;
+
 import Strategies.Strategy;
-import Utils.SimpleEncoder;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Service {
-    private UserRepository UserRepo = new UserRepository();
-    private FriendshipRepository FriendsRepo = new FriendshipRepository();
-    private Strategy validator = null;
+    private final UserRepository UserRepo = new UserRepository();
+    private final FriendshipRepository FriendsRepo = new FriendshipRepository();
+    private final Strategy validator ;
 
     /**
      * Constructor needs validation strategy.
@@ -33,11 +32,10 @@ public class Service {
      * @param email the new user's email
      * @param password the new user's password
      *
-     * @throws Exception
      * */
     public void addUser(String name, String userName, String email, String password) throws Exception {
         validator.setData(name, userName, email, password);
-
+        validator.execute();
 
 
         User U = new User(email, userName, name, password);
@@ -51,8 +49,9 @@ public class Service {
      *
      * @throws SocialNetworkException in case of user not existing or data not being valid
      * */
-    public void removeUser(String userName, String email) throws SocialNetworkException {
+    public void removeUser(String userName, String email) throws Exception {
         validator.setData(null, userName, email,null);
+        validator.execute();
         EID key = new EID(email + userName);
 
         UserRepo.removeElem(key);
@@ -60,7 +59,7 @@ public class Service {
         FriendsRepo.removeElem(key);
         FriendsRepo.getStream().forEach(E -> {
             try {
-                E.removeFriend(key);
+                FriendsRepo.removeFriends(E.getUserId(), key);
             } catch (SocialNetworkException e) {
                 throw new RuntimeException(e);
             }
@@ -74,7 +73,6 @@ public class Service {
      * @param emailA email of the first user
      * @param userNameB username of the second user
      * @param emailB email of the second user
-     * @throws Exception
      * */
     public void addFriendship(String userNameA, String emailA, String userNameB, String emailB) throws Exception {
         validator.setData(null, userNameA, emailA, null);
@@ -86,8 +84,7 @@ public class Service {
         EID keyA = new EID(emailA + userNameA);
         EID keyB = new EID(emailB + userNameB);
 
-        FriendsRepo.lookUp(keyA).addFriend(keyB);
-        FriendsRepo.lookUp(keyB).addFriend(keyA);
+        FriendsRepo.addFriends(keyA,keyB);
     }
     public void removeFriendship(String userNameA, String emailA, String userNameB, String emailB) throws Exception {
         validator.setData(null, userNameA, emailA, null);
@@ -99,8 +96,8 @@ public class Service {
         EID keyA = new EID(emailA + userNameA);
         EID keyB = new EID(emailB + userNameB);
 
-        FriendsRepo.lookUp(keyA).removeFriend(keyB);
-        FriendsRepo.lookUp(keyB).removeFriend(keyA);
+        FriendsRepo.removeFriends(keyA, keyB);
+
     }
 
 
@@ -121,12 +118,12 @@ public class Service {
                 buffer.add(user);
             }
 
-            EID current = null;
+            EID current ;
             while(!buffer.isEmpty()){
                 current = buffer.remove();
                 if(!passed.get(current)){
                     passed.put(current, true);
-                    FriendsRepo.lookUp(current).getStream().forEach(friend -> buffer.add(friend));
+                    FriendsRepo.lookUp(current).getStream().forEach(friend -> buffer.add(friend.first));
                 }
             }
         }
@@ -139,7 +136,7 @@ public class Service {
      * */
     private void DFS(EID start, List<EID> base ){
         base.add(start);
-        List<EID> friends = FriendsRepo.lookUp(start).getStream().toList();
+        List<EID> friends = FriendsRepo.lookUp(start).getStream().map(E -> E.first).toList();
         for (EID friend :
                 friends) {
             if(!base.contains(friend)){
