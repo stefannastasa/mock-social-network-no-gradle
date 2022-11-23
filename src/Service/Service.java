@@ -11,6 +11,7 @@ import Strategies.Strategy;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 public class Service {
     private final UserRepository UserRepo = new UserRepository();
@@ -177,4 +178,9 @@ public class Service {
 
 
     }
+
+    public Stream<String> getAllUsers(){
+        return UserRepo.getStream().map(E -> E.getUsername());
+    }
+
 }
