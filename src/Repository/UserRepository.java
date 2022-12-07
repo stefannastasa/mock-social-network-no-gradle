@@ -9,14 +9,11 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import static java.lang.System.exit;
-
 public class UserRepository implements Repository<EID, User>{
     private final HashMap<EID, User> elemList = new HashMap<>();
-    private final String fileName = "users.csv";
 
-    private String url = "jdbc:postgresql://localhost:5432/mock-social-network";
-    private String username = "tefan";
+
+    private final String url = "jdbc:postgresql://localhost:5432/mock-social-network";
 
     private void addToDb(User user){
         String sql = "INSERT INTO USERS (uid, email, username, name, password) VALUES (?,?,?,?,?)";
@@ -47,9 +44,8 @@ public class UserRepository implements Repository<EID, User>{
     public UserRepository(){
         try (Connection connection = DriverManager.getConnection(url);
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM USERS");
-             ResultSet resultSet = statement.executeQuery();) {
+             ResultSet resultSet = statement.executeQuery()) {
             while(resultSet.next()){
-                EID id = new EID(resultSet.getBytes("uid"));
                 String name = resultSet.getString("name");
                 String username = resultSet.getString("username");
                 String email = resultSet.getString("email");
@@ -80,6 +76,7 @@ public class UserRepository implements Repository<EID, User>{
         if(err == null) {
             throw new ElementNotFoundException();
         }
+        deleteFromDb(err);
     }
 
     @Override

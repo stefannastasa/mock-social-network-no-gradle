@@ -1,27 +1,17 @@
 package Repository;
 
 import Entities.Friendships;
-import Entities.User;
 import Exceptions.RepoSpecific.ElementExistsException;
 import Exceptions.RepoSpecific.ElementNotFoundException;
-
 import Entities.EID;
 import Exceptions.SocialNetworkException;
-
-import java.io.*;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class FriendshipRepository implements Repository<EID, Friendships> {
     private final HashMap<EID, Friendships> elemList = new HashMap<>();
-    private final String fileName = "friends.csv";
-    private String url = "jdbc:postgresql://localhost:5432/mock-social-network";
+    private final String url = "jdbc:postgresql://localhost:5432/mock-social-network";
 
     private void addToDb(EID user1, EID user2){
         String sql = "INSERT INTO FRIENDSHIPS (user1, user2) VALUES (?,?)";
@@ -52,7 +42,7 @@ public class FriendshipRepository implements Repository<EID, Friendships> {
         // fetches all friendships from the database
         try (Connection connection = DriverManager.getConnection(url);
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM FRIENDSHIPS");
-             ResultSet resultSet = statement.executeQuery();){
+             ResultSet resultSet = statement.executeQuery()){
             while(resultSet.next()){
                 EID user1 = new EID(resultSet.getBytes("user1"));
                 EID user2 = new EID(resultSet.getBytes("user2"));
@@ -72,9 +62,7 @@ public class FriendshipRepository implements Repository<EID, Friendships> {
 
 
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (SocialNetworkException e) {
+        } catch (SQLException | SocialNetworkException e) {
             e.printStackTrace();
         }
     }
