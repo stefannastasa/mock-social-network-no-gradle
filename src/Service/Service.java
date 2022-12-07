@@ -123,7 +123,9 @@ public class Service {
                 current = buffer.remove();
                 if(!passed.get(current)){
                     passed.put(current, true);
-                    FriendsRepo.lookUp(current).getStream().forEach(friend -> buffer.add(friend.first));
+                    if(FriendsRepo.lookUp(current) != null){
+                        FriendsRepo.lookUp(current).getStream().forEach(friend -> buffer.add(friend.first));
+                    }
                 }
             }
         }
@@ -136,6 +138,9 @@ public class Service {
      * */
     private void DFS(EID start, List<EID> base ){
         base.add(start);
+        if( FriendsRepo.lookUp(start) == null){
+            return;
+        }
         List<EID> friends = FriendsRepo.lookUp(start).getStream().map(E -> E.first).toList();
         for (EID friend :
                 friends) {

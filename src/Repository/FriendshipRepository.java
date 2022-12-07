@@ -76,6 +76,12 @@ public class FriendshipRepository implements Repository<EID, Friendships> {
     }
 
     public void addFriends(EID keyA, EID keyB) throws SocialNetworkException {
+        if(this.lookUp(keyA) == null){
+            this.addElem(new Friendships(keyA));
+        }
+        if(this.lookUp(keyB) == null){
+            this.addElem(new Friendships(keyB));
+        }
         this.lookUp(keyA).addFriend(keyB);
         this.lookUp(keyB).addFriend(keyA);
         addToDb(keyA, keyB);
@@ -85,7 +91,7 @@ public class FriendshipRepository implements Repository<EID, Friendships> {
     public void removeFriends(EID keyA, EID keyB) throws SocialNetworkException {
         this.lookUp(keyA).removeFriend(keyB);
         this.lookUp(keyB).removeFriend(keyA);
-        deleteFromDb(keyA,keyB);
+        deleteFromDb(keyA, keyB);
         deleteFromDb(keyB, keyA);
     }
 
