@@ -19,8 +19,7 @@ public class Main {
         System.out.println("4.Sterge prietenie");
         System.out.println("5.Afiseaza numar comunitati din aplicatie");
         System.out.println("6.Afiseaza cea mai mare comunitate");
-        System.out.println("7.Afiseaza toti utilizatorii");
-        System.out.println("8.Exit");
+        System.out.println("7.Exit");
 
         System.out.println("Astept selectie...");
         return Integer.parseInt(scanner.nextLine());
@@ -181,9 +180,6 @@ public class Main {
                     }
                     break;
                 case 7:
-                    appBackend.getAllUsers().forEach(System.out::println);
-                    break;
-                case 8:
                     System.out.println("Exiting...");
                     System.exit(0);
             }
