@@ -10,6 +10,11 @@ import java.util.Arrays;
 public class EID {
 
     SimpleEncoder enc = SimpleEncoder.getInstance();
+
+    public byte[] getRaw() {
+        return raw;
+    }
+
     byte[] raw;
 
     /**
